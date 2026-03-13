@@ -4,51 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>我的像素小人养成游戏 - 修复完结美化版</title>
-    <style>
-        body { background-color: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: '微软雅黑', sans-serif; overflow: hidden; }
+ <style>
+        /* --- 全局背景：粉蓝清新渐变 --- */
+        body { 
+            background: linear-gradient(135deg, #e0f2fe 0%, #ffe4e1 100%); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; font-family: 'Nunito', '微软雅黑', sans-serif; overflow: hidden; 
+        }
 
-        /* 【核心美化】：包裹层，模拟像素风格皮肤并固定顶部位置 */
+        /* --- 主控制面板：半透明磨砂质感 --- */
         #controls-container {
             width: 95%; max-width: 600px;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36z8gAFWYAkyAKKggAFQQA4QA/AAAwEAE4QA+AAAAAElFTkSuQmCC'); /* 像素风格纹理 */
-            background-color: #ecf0f1;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 4px solid #333; /* 像素风格描边 */
-            border-radius: 8px; /* 像素风格圆角 */
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 3px solid #bde0fe; 
+            border-radius: 20px; 
             box-sizing: border-box;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 20px rgba(189, 224, 254, 0.5); 
             font-size: 14px;
             display: flex; flex-direction: column; gap: 10px;
             position: relative;
-            z-index: 100; /* 确保在房间层之上 */
+            z-index: 100;
         }
 
-        /* 将原本的 top-controls 和 ui-panel 的内容进行整合和定位 */
         #top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 5px;}
-        .top-btn-row { display: flex; gap: 5px;}
-        .control-btn { padding: 6px 12px; background-color: #f1c40f; color: #333; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; border: 2px solid #333; }
-        .control-btn.danger { background-color: #e74c3c; color: white; border: 2px solid #333;}
+        .top-btn-row { display: flex; gap: 8px;}
 
-        /* 美化的状态栏皮肤，使用内嵌 div 模拟皮肤区域 */
+        /* --- 【全新手帐风】通用按钮样式 --- */
+        .control-btn, .actions button { 
+            padding: 8px 15px; 
+            background-color: #ffffff; /* 纯白底色 */
+            border-radius: 12px; /* 圆润的贴纸感 */
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 13px; 
+            transition: all 0.2s ease; /* 动画过渡 */
+        }
+
+        /* 顶部 UI开关按钮：浅黄色虚线 */
+        .control-btn { 
+            color: #f39c12; 
+            border: 2px dashed #f1c40f; 
+        }
+        .control-btn:hover { background-color: #fffde7; transform: scale(1.05); } 
+        .control-btn:active { transform: scale(0.95); } 
+
+        /* 顶部 重置按钮：浅红色虚线 */
+        .control-btn.danger { 
+            color: #e74c3c; 
+            border: 2px dashed #ffb6c1; 
+        }
+        .control-btn.danger:hover { background-color: #ffebee; transform: scale(1.05); }
+        .control-btn.danger:active { transform: scale(0.95); }
+
+        /* --- 状态栏：便利贴质感 --- */
         #status-panel-skin {
-            background-color: #fdfefe;
-            padding: 10px;
-            border: 2px dashed #95a5a6;
-            border-radius: 5px;
+            background-color: #ffffff;
+            padding: 12px;
+            border: 2px dashed #a2d2ff; 
+            border-radius: 15px;
             display: flex; flex-direction: column; gap: 10px;
             margin-bottom: 5px;
         }
 
         .panel-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 5px;}
-        .stats span { margin-right: 5px; font-weight: bold; color: #333; }
-        #coin-val { color: #f39c12; font-size: 16px; font-weight: bold; font-family: 'Courier New', monospace; /* 模拟像素字体 */}
-        .pet-name-text { color: #8e44ad; font-weight: 900; }
-        .actions button { padding: 6px 8px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; margin-bottom: 5px; border: 2px solid #333; }
-        .actions button:hover { background-color: #2980b9; }
-        .actions .furniture-btn { background-color: #27ae60; }
+        .stats { color: #5d6d7e; font-size: 13px; }
+        .stats span { margin-right: 6px; font-weight: bold; color: #34495e; }
+        #coin-val { color: #f39c12; font-size: 16px; font-weight: 900; }
+        .pet-name-text { color: #ffafcc; font-size: 15px; font-weight: 900; }
 
-        #room { width: 95%; max-width: 600px; height: 450px; background-image: url('room.jpg'); background-size: cover; background-position: center; position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.8); border-radius: 8px; border: 4px solid #333;}
+        /* 动作按钮容器 */
+        .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        
+        /* 喂食按钮：浅蓝色虚线 */
+        .actions button { 
+            color: #5dade2; 
+            border: 2px dashed #aed6f1; 
+        }
+        .actions button:hover { background-color: #ebf5fb; transform: scale(1.05); }
+        .actions button:active { transform: scale(0.95); }
+
+        /* 家具交互按钮：浅粉色虚线 */
+        .actions .furniture-btn { 
+            color: #f06292;
+            border: 2px dashed #f8bbd0;
+        }
+        .actions .furniture-btn:hover { background-color: #fce4ec; transform: scale(1.05); }
+        .actions .furniture-btn:active { transform: scale(0.95); }
+
+        /* --- 房间与小人 --- */
+        #room { 
+            width: 95%; max-width: 600px; height: 450px; 
+            background-image: url('room.jpg'); background-size: cover; background-position: center; 
+            position: relative; overflow: hidden; 
+            box-shadow: 0 10px 30px rgba(255, 175, 204, 0.4); 
+            border-radius: 20px; 
+            border: 5px solid #ffffff; 
+        }
+
         .furniture { position: absolute; display: flex; justify-content: center; align-items: center; color: transparent; border-radius: 4px; background-color: rgba(0, 0, 0, 0); z-index: 5; cursor: pointer; }
 
         #bed { top: 20px; right: 60px; width: 110px; height: 160px; }
@@ -70,25 +125,54 @@
             width: 100%; height: 100%;
             background-image: url('pet_stand.png');
             background-size: contain; background-repeat: no-repeat; background-position: center bottom;
-            filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5));
+            filter: drop-shadow(0px 6px 4px rgba(0,0,0,0.3)); 
             transition: transform 0.2s linear;
         }
 
         .sleeping { opacity: 0.8; }
 
+        /* --- 对话气泡：粉色软萌风 --- */
         #speech-bubble {
             position: absolute;
-            top: -20px;
+            top: -30px;
             left: 50%; transform: translateX(-50%);
-            width: max-content; max-width: 120px; background-color: white; color: #333; padding: 5px 10px; border-radius: 10px; font-size: 12px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: none; z-index: 20; pointer-events: none;
+            width: max-content; max-width: 120px; 
+            background-color: #ffffff; 
+            color: #d81159; 
+            padding: 6px 12px; 
+            border-radius: 15px; 
+            border: 2px solid #ffafcc;
+            font-size: 12px; font-weight: bold; 
+            box-shadow: 0 4px 10px rgba(255, 175, 204, 0.4); 
+            display: none; z-index: 20; pointer-events: none;
         }
-        #speech-bubble::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-width: 5px 5px 0; border-style: solid; border-color: white transparent transparent transparent; }
+        #speech-bubble::after { 
+            content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); 
+            border-width: 6px 6px 0; border-style: solid; border-color: #ffafcc transparent transparent transparent; 
+        }
 
-        #name-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; }
-        .modal-box { background-color: #ecf0f1; padding: 20px; border-radius: 10px; text-align: center; width: 80%; max-width: 300px; border: 4px solid #333;}
-        .modal-box h2 { margin-top: 0; font-size: 18px; color: #2c3e50; }
-        .modal-box input { padding: 8px; font-size: 14px; width: 80%; margin-bottom: 15px; border: 1px solid #bdc3c7; border-radius: 5px; outline: none; border: 2px solid #333;}
-        .modal-box button { padding: 8px 15px; font-size: 14px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; border: 2px solid #333;}
+        /* --- 名字输入弹窗：手帐风同步 --- */
+        #name-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(162, 210, 255, 0.6); backdrop-filter: blur(3px); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal-box { background-color: #ffffff; padding: 25px; border-radius: 25px; text-align: center; width: 80%; max-width: 300px; border: 4px solid #bde0fe; box-shadow: 0 10px 30px rgba(0,0,0,0.1);}
+        .modal-box h2 { margin-top: 0; font-size: 18px; color: #457b9d; }
+        
+        .modal-box input { 
+            padding: 10px; font-size: 14px; width: 80%; margin-bottom: 20px; 
+            border: 2px dashed #a2d2ff; /* 虚线输入框 */
+            border-radius: 12px; outline: none; color: #457b9d; font-weight: bold;
+        }
+        .modal-box input:focus { border-color: #ffafcc; }
+        
+        .modal-box button { 
+            padding: 10px 20px; font-size: 15px; 
+            background-color: #ffffff; 
+            color: #f06292; 
+            border: 2px dashed #f8bbd0; 
+            border-radius: 15px; cursor: pointer; font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .modal-box button:hover { background-color: #fce4ec; transform: scale(1.05); }
+        .modal-box button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -145,253 +229,368 @@
     </div>
 
     <script>
+
+const clickSound = new Audio('click.mp3');
+
+// 统一给页面上所有带交互的元素（按钮、家具、小人）加上点击音效
+document.addEventListener('click', function(event) {
+    // 检查点击的元素是不是按钮、家具或者小人
+    const target = event.target;
+    if (
+        target.tagName === 'BUTTON' || 
+        target.classList.contains('furniture') || 
+        target.id === 'pet' || 
+        target.id === 'pet-sprite'
+    ) {
+        // 每次播放前重置时间为0，这样你连续快速点击也能听到声音
+        clickSound.currentTime = 0; 
+        // 尝试播放（捕获错误以防浏览器自动播放限制）
+        clickSound.play().catch(e => console.log("等待用户交互后才能播放音效"));
+    }
+});
+
         const pet = document.getElementById('pet');
-        const petSprite = document.getElementById('pet-sprite');
-        const room = document.getElementById('room');
-        const statusDisplay = document.getElementById('status-val');
-        const bubble = document.getElementById('speech-bubble');
-        const nameModal = document.getElementById('name-modal');
-        const displayName = document.getElementById('display-name');
-        const statusPanelSkin = document.getElementById('status-panel-skin');
+const petSprite = document.getElementById('pet-sprite');
+const room = document.getElementById('room');
+const statusDisplay = document.getElementById('status-val');
+const bubble = document.getElementById('speech-bubble');
+const nameModal = document.getElementById('name-modal');
+const displayName = document.getElementById('display-name');
+const statusPanelSkin = document.getElementById('status-panel-skin');
 
-        const petImages = { stand: 'pet_stand.png', walk: 'pet_walk.png', work: 'pet_work.png', nap_stand: 'pet_nap_stand.png', nap_sofa: 'pet_nap_sofa.png', game: 'pet_game.png', shower: 'pet_shower.png', toilet: 'pet_toilet.png', wash: 'pet_wash.png', sleep: 'pet_sleep.png', sad: 'pet_sad.png' };
+const petImages = { stand: 'pet_stand.png', walk: 'pet_walk.png', work: 'pet_work.png', nap_stand: 'pet_nap_stand.png', nap_sofa: 'pet_nap_sofa.png', game: 'pet_game.png', shower: 'pet_shower.png', toilet: 'pet_toilet.png', wash: 'pet_wash.png', sleep: 'pet_sleep.png', sad: 'pet_sad.png' };
 
-        // 【核心修复】：结合用户提供的精确像素坐标更新交互位置
-        const furnitureCoords = {
-            desk: { left: 70, top: 100, room: 'study' }, // 走到书桌前交互点
-            tv: { left: 200, top: 280, room: 'living' }, // 走到电视机前面交互点（站在地毯上）
-            sofa: { left: 263, top: 200, room: 'living' }, // 走到沙发上的交互点
-            toilet: { left: 527, top: 336, room: 'bathroom' }, // 走到马桶交互点（坐在马桶上）
-            sink: { left: 425, top: 300, room: 'bathroom' }, // 走到洗漱台交互点
-            shower: { left: 528, top: 300, room: 'bathroom' }, // 走到淋浴交互点
-            bed: { left: 413, top: 90, room: 'bedroom' } // 走到床上的交互点
-        };
+const furnitureCoords = {
+    desk: { left: 70, top: 100, room: 'study' }, 
+    tv: { left: 200, top: 280, room: 'living' }, 
+    sofa: { left: 263, top: 200, room: 'living' }, 
+    toilet: { left: 527, top: 336, room: 'bathroom' }, 
+    sink: { left: 425, top: 300, room: 'bathroom' }, 
+    shower: { left: 528, top: 300, room: 'bathroom' }, 
+    bed: { left: 413, top: 90, room: 'bedroom' } 
+};
 
-        // 【核心修复】：限制闲逛时的防穿墙和家具防踩踏边界。客厅电视机水平线以上（数值更小方向）不能去。
-        const roomsData = {
-            // 书房：限制在书桌前地板区域
-            study: { minX: 40, maxX: 120, minY: 100, maxY: 180, doorX: 130, doorY: 220 },
-            // 卧室：限制在床前地板区域
-            bedroom: { minX: 300, maxX: 430, minY: 150, maxY: 220, doorX: 360, doorY: 220 },
-            // 客厅：限制不要穿过左侧墙壁和顶部墙壁。maxY限制为320px，脚底绝不能高于电视机水平线（数值越大越靠下）。
-            living: { minX: 180, maxX: 300, minY: 192, maxY: 320, doorX: 250, doorY: 250 },
-            // 浴室：限制在淋浴间、洗漱台、马桶前的蓝色地板上。确保不要踩到淋浴间、洗漱台、马桶家具和防踩踏墙。
-            bathroom: { minX: 380, maxX: 500, minY: 250, maxY: 380, doorX: 380, doorY: 300 }
-        };
-        const HUB = { x: 250, y: 250 };
+const roomsData = {
+    study: { minX: 45, maxX: 190, minY: 92, maxY: 145, doorX: 165, doorY: 175 },
+    bedroom: { minX: 360, maxX: 460, minY: 125, maxY: 150, doorX: 356, doorY: 175 },
+    living: { minX: 185, maxX: 350, minY: 197, maxY: 295, doorX: 250, doorY: 200 }, 
+    bathroom: { minX: 390, maxX: 520, minY: 300, maxY: 350, doorX: 287, doorY: 290 }
+};
 
-        let petName = "";
-        let coins = 10, mood = 100, hunger = 100, energy = 100;
-        let currentAction = 'wandering';
-        let currentRoom = 'living'; let currentX = 250, currentY = 250; let isMoving = false;
-
-        let moveInterval, timeInterval;
-
-        function initGame() {
-            const savedName = localStorage.getItem('petName');
-            if (!savedName) { nameModal.style.display = 'flex'; }
-            else {
-                petName = savedName;
-                coins = parseInt(localStorage.getItem('coins')) || 10;
-                mood = parseInt(localStorage.getItem('mood')) || 100;
-                hunger = parseInt(localStorage.getItem('hunger')) || 100;
-                energy = parseInt(localStorage.getItem('energy')) || 100;
-                startGame(); speak(`主人，你回来啦！`);
-            }
+// 【修改部分 1】：新增电视机禁区
+function isPositionSafe(x, y, room) {
+    if (room === 'living') {
+        // 沙发实体绝对禁区
+        if (y >= 170 && y <= 224) { 
+            if (x >= 235 && x <= 300) return false;
         }
-
-        function confirmName() {
-            const inputVal = document.getElementById('name-input').value.trim();
-            if (inputVal === "") { alert("名字不能为空哦！"); return; }
-            petName = inputVal; nameModal.style.display = 'none'; startGame(); speak(`你好！我是${petName}！`);
+        // 桌子实体绝对禁区
+        if (y >= 230 && y <= 275) {
+            if (x >= 235 && x <= 300) return false;
         }
-
-        function saveGame() {
-            if (petName !== "") {
-                localStorage.setItem('petName', petName); localStorage.setItem('coins', coins);
-                localStorage.setItem('mood', mood); localStorage.setItem('hunger', hunger); localStorage.setItem('energy', energy);
-            }
+        // 📺 新增：电视机实体禁区（防止踩在电视机顶部）
+        // 电视机大概在 left 200 左右，将 y > 275 且 x 在电视机范围内的地方设为死角
+        if (y >= 275 && y <= 295) {
+            if (x >= 170 && x <= 230) return false; 
         }
+    }
+    return true;
+}
 
-        function resetGame() {
-            if (confirm("确定要抛弃现在的小人，重新开始吗？")) {
-                localStorage.clear();
+let petName = "";
+let coins = 10, mood = 100, hunger = 100, energy = 100;
+let currentAction = 'wandering';
+let currentRoom = 'living'; 
 
-                clearInterval(moveInterval);
-                clearInterval(timeInterval);
+// 【修复2】：修改初始坐标点
+let currentX = 201, currentY = 279; 
+let isMoving = false;
 
-                petName = ""; coins = 10; mood = 100; hunger = 100; energy = 100;
-                currentAction = 'wandering'; currentRoom = 'living'; currentX = 250; currentY = 250; isMoving = false;
+let moveInterval, timeInterval;
 
-                document.getElementById('name-input').value = "";
-                nameModal.style.display = 'flex';
-                updateUI();
-            }
+function initGame() {
+    const savedName = localStorage.getItem('petName');
+    if (!savedName) { nameModal.style.display = 'flex'; }
+    else {
+        petName = savedName;
+        coins = parseInt(localStorage.getItem('coins')) || 10;
+        mood = parseInt(localStorage.getItem('mood')) || 100;
+        hunger = parseInt(localStorage.getItem('hunger')) || 100;
+        energy = parseInt(localStorage.getItem('energy')) || 100;
+        startGame(); speak(`主人，你回来啦！`);
+    }
+}
+
+function confirmName() {
+    const inputVal = document.getElementById('name-input').value.trim();
+    if (inputVal === "") { alert("名字不能为空哦！"); return; }
+    petName = inputVal; nameModal.style.display = 'none'; startGame(); speak(`你好！我是${petName}！`);
+}
+
+function saveGame() {
+    if (petName !== "") {
+        localStorage.setItem('petName', petName); localStorage.setItem('coins', coins);
+        localStorage.setItem('mood', mood); localStorage.setItem('hunger', hunger); localStorage.setItem('energy', energy);
+    }
+}
+
+function resetGame() {
+    if (confirm("确定要抛弃现在的小人，重新开始吗？")) {
+        localStorage.clear();
+
+        clearInterval(moveInterval);
+        clearInterval(timeInterval);
+
+        petName = ""; coins = 10; mood = 100; hunger = 100; energy = 100;
+        currentAction = 'wandering'; currentRoom = 'living'; 
+        // 【修复3】：重置游戏时也回到新坐标
+        currentX = 201; currentY = 279; 
+        isMoving = false;
+
+        document.getElementById('name-input').value = "";
+        nameModal.style.display = 'flex';
+        updateUI();
+    }
+}
+
+function startGame() {
+    displayName.innerText = petName; updateUI();
+    pet.style.left = currentX + 'px'; pet.style.top = currentY + 'px';
+    moveInterval = setInterval(movePet, 8000);
+    timeInterval = setInterval(timePasses, 60000);
+}
+
+function updateUI() {
+    document.getElementById('coin-val').innerText = coins; document.getElementById('mood-val').innerText = mood;
+    document.getElementById('hunger-val').innerText = hunger; document.getElementById('energy-val').innerText = energy;
+    saveGame();
+}
+function toggleStatusPanelSkin() { const panel = statusPanelSkin; panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'flex' : 'none'; }
+
+let bubbleTimeout;
+function speak(text) {
+    bubble.innerText = text; bubble.style.display = 'block';
+    clearTimeout(bubbleTimeout); bubbleTimeout = setTimeout(() => { bubble.style.display = 'none'; }, 3000);
+}
+
+function setSprite(pose) { petSprite.style.backgroundImage = `url('${petImages[pose]}')`; }
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+function faceTarget(targetX) {
+    if (targetX < currentX) petSprite.style.transform = 'scaleX(-1)';
+    else petSprite.style.transform = 'scaleX(1)';
+}
+  
+async function smartWalk(targetX, targetY, targetRoom) {
+    isMoving = true;
+    setSprite('walk');
+
+    const walkTo = async (px, py) => {
+        if (currentX === px && currentY === py) return; 
+        faceTarget(px);
+        const dist = Math.sqrt(Math.pow(px - currentX, 2) + Math.pow(py - currentY, 2));
+        const timeMs = Math.max(300, dist * 20); 
+        pet.style.transition = `top ${timeMs}ms linear, left ${timeMs}ms linear`;
+        currentX = Math.round(px); currentY = Math.round(py);
+        pet.style.left = currentX + 'px'; pet.style.top = currentY + 'px';
+        await sleep(timeMs);
+    };
+
+    // 🚶‍♂️ 【修改点 A：出门时的直角拐弯】
+    if (currentRoom !== 'living') {
+        if (currentRoom === 'bathroom') {
+            // 浴室出门：先向上走到过道Y轴，再横向走到门口
+            await walkTo(currentX, roomsData[currentRoom].doorY);
+            await walkTo(roomsData[currentRoom].doorX, roomsData[currentRoom].doorY);
+        } else {
+            // 书房/卧室出门：先横向走到门口所在的X轴，再垂直往下走出门
+            await walkTo(roomsData[currentRoom].doorX, currentY);
+            await walkTo(roomsData[currentRoom].doorX, roomsData[currentRoom].doorY);
         }
+    }
 
-        function startGame() {
-            displayName.innerText = petName; updateUI();
-            pet.style.left = currentX + 'px'; pet.style.top = currentY + 'px';
-            moveInterval = setInterval(movePet, 8000);
-            timeInterval = setInterval(timePasses, 60000);
+    // --- 核心绕行网格 (保持不变) ---
+    const SAFE_Y_CORRIDOR = 232; 
+    const SAFE_Y_BOTTOM = 285;   
+    const SAFE_Y_TOP = 232;      
+    
+    const SAFE_X_LEFT = 200;     
+    const SAFE_X_RIGHT = 310;    
+
+    let endYInLiving = (targetRoom === 'living') ? targetY : roomsData[targetRoom].doorY;
+    let endXInLiving = (targetRoom === 'living') ? targetX : roomsData[targetRoom].doorX;
+
+    const getZone = (y) => {
+        if (y < 200) return 'top';
+        if (y > 240) return 'bottom';
+        return 'mid';
+    };
+
+    let startZone = getZone(currentY);
+    let endZone = getZone(endYInLiving);
+
+    if (startZone !== endZone) {
+        let currentSafeX = (currentX < 268) ? SAFE_X_LEFT : SAFE_X_RIGHT;
+        let startSafeY = currentY;
+        if (startZone === 'top') startSafeY = SAFE_Y_TOP;
+        if (startZone === 'bottom') startSafeY = SAFE_Y_BOTTOM;
+        if (startZone === 'mid') startSafeY = SAFE_Y_CORRIDOR;
+
+        await walkTo(currentX, startSafeY);     
+        await walkTo(currentSafeX, startSafeY); 
+
+        let targetSafeY = SAFE_Y_CORRIDOR;
+        if (endZone === 'top') targetSafeY = SAFE_Y_TOP;
+        if (endZone === 'bottom') targetSafeY = SAFE_Y_BOTTOM;
+        
+        await walkTo(currentSafeX, targetSafeY); 
+        await walkTo(endXInLiving, targetSafeY);
+    } else {
+        let safeY = SAFE_Y_CORRIDOR;
+        if (startZone === 'top') safeY = SAFE_Y_TOP;
+        if (startZone === 'bottom') safeY = SAFE_Y_BOTTOM;
+        
+        await walkTo(currentX, safeY);
+        await walkTo(endXInLiving, safeY);
+    }
+
+    // 🚶‍♂️ 【修改点 B：进门时的直角拐弯】
+    if (targetRoom !== 'living') {
+        // 先走到目标房间的门口
+        await walkTo(roomsData[targetRoom].doorX, roomsData[targetRoom].doorY);
+        
+        if (targetRoom === 'bathroom') {
+            // 进浴室：先横向走到目标位置的X轴正上方，再垂直往下走到目标
+            await walkTo(targetX, roomsData[targetRoom].doorY);
+            await walkTo(targetX, targetY);
+        } else {
+            // 进书房/卧室：先垂直往上走到目标位置的Y轴正侧方，再横向走到目标
+            await walkTo(roomsData[targetRoom].doorX, targetY);
+            await walkTo(targetX, targetY);
         }
+    } else {
+        // 如果终点在客厅，直接走到目标
+        await walkTo(targetX, targetY);
+    }
 
-        function updateUI() {
-            document.getElementById('coin-val').innerText = coins; document.getElementById('mood-val').innerText = mood;
-            document.getElementById('hunger-val').innerText = hunger; document.getElementById('energy-val').innerText = energy;
-            saveGame();
+    currentRoom = targetRoom;
+    isMoving = false;
+}
+
+    function pokePet() {
+    if (currentAction === 'sleeping') { speak("zzZ..."); return; }
+    mood = Math.min(100, mood + 20); updateUI();
+    if (currentAction === 'sad' && mood >= 30) {
+        currentAction = 'wandering'; setSprite('stand'); statusDisplay.innerText = '闲逛中';
+        speak("谢谢主人，心情好些了..."); return;
+    } else if (currentAction === 'sad') { speak("别碰我..."); return; }
+    const replies = [`主人好！`, `我是${petName}~`, "贴贴！", "好痒呀~"];
+    speak(replies[Math.floor(Math.random() * replies.length)]);
+}
+
+async function movePet() {
+    if (currentAction !== 'wandering' || isMoving) return;
+    
+    if (mood < 20) {
+        currentAction = 'sad'; setSprite('sad'); statusDisplay.innerText = '极度烦躁';
+        speak("我什么都不想干！！"); return; 
+    }
+    
+    const rand = Math.random();
+    if (rand < 0.2) { setSprite('stand'); statusDisplay.innerText = '发呆中'; speak("阿巴阿巴..."); return; } 
+    else if (rand < 0.2) { setSprite('nap_stand'); statusDisplay.innerText = '打盹中'; speak("站着睡着了..."); return; }
+
+    statusDisplay.innerText = '闲逛中';
+
+    const roomNames = Object.keys(roomsData);
+    const targetRoom = Math.random() < 0.3 ? roomNames[Math.floor(Math.random() * roomNames.length)] : currentRoom;
+    const zone = roomsData[targetRoom];
+    
+    let targetX, targetY;
+    let safePointFound = false;
+    let attempts = 0;
+
+    while (!safePointFound && attempts < 15) {
+        targetX = Math.floor(Math.random() * (zone.maxX - zone.minX) + zone.minX);
+        targetY = Math.floor(Math.random() * (zone.maxY - zone.minY) + zone.minY);
+        
+        if (isPositionSafe(targetX, targetY, targetRoom)) {
+            safePointFound = true;
         }
-        function toggleStatusPanelSkin() { const panel = statusPanelSkin; panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'flex' : 'none'; }
+        attempts++;
+    }
 
-        let bubbleTimeout;
-        function speak(text) {
-            bubble.innerText = text; bubble.style.display = 'block';
-            clearTimeout(bubbleTimeout); bubbleTimeout = setTimeout(() => { bubble.style.display = 'none'; }, 3000);
-        }
+    if (!safePointFound) return;
 
-        function setSprite(pose) { petSprite.style.backgroundImage = `url('${petImages[pose]}')`; }
+    await smartWalk(targetX, targetY, targetRoom);
 
-        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    if (currentAction === 'wandering') setSprite('stand');
+    if (Math.random() < 0.2) { if (hunger < 40) speak("肚子饿了..."); else if (mood < 50) speak("好无聊..."); }
+}
 
-        function faceTarget(targetX) {
-            if (targetX < currentX) petSprite.style.transform = 'scaleX(-1)';
-            else petSprite.style.transform = 'scaleX(1)';
-        }
+function timePasses() {
+    if (currentAction === 'wandering' || currentAction === 'sad') {
+        hunger = Math.max(0, hunger - 1); energy = Math.max(0, energy - 5);
+        if (Math.random() < 0.5) coins += 1;
+        if (energy < 30 && !isMoving) { interactWith('bed'); speak("扛不住了，去睡觉..."); }
+    } else if (currentAction === 'bed') {
+        energy = Math.min(100, energy + 15);
+        if (energy === 100) { currentAction = 'wandering'; statusDisplay.innerText = '闲逛中'; petSprite.classList.remove('sleeping'); setSprite('stand'); speak("睡饱啦！"); }
+    }
+    if (hunger < 50) mood = Math.max(0, mood - 2);
+    updateUI();
+}
 
-        async function smartWalk(targetX, targetY, targetRoom) {
-            isMoving = true;
-            setSprite('walk');
+async function interactWith(type) {
+    if (currentAction === 'bed' && type !== 'bed') { speak("呼噜噜..."); return; }
+    if (currentAction === 'sad') { speak("别管我，烦着呢！"); return; }
+    if (isMoving) { speak("正走着呢，别催！"); return; }
 
-            if (currentRoom !== targetRoom) {
-                if(currentRoom !== 'living') {
-                    faceTarget(roomsData[currentRoom].doorX);
-                    currentX = roomsData[currentRoom].doorX; currentY = roomsData[currentRoom].doorY;
-                    pet.style.left = currentX + 'px'; pet.style.top = currentY + 'px';
-                    await sleep(1500);
-                }
+    currentAction = type;
+    const statusMap = { desk: '工作中', tv: '打游戏中', sofa: '沙发打盹', toilet: '上厕所', sink: '洗漱', shower: '洗澡', bed: '睡觉中' };
+    statusDisplay.innerText = statusMap[type];
 
-                faceTarget(HUB.x);
-                currentX = HUB.x; currentY = HUB.y;
-                pet.style.left = currentX + 'px'; pet.style.top = currentY + 'px';
-                await sleep(1500);
+    const targetData = furnitureCoords[type];
 
-                if(targetRoom !== 'living') {
-                    faceTarget(roomsData[targetRoom].doorX);
-                    currentX = roomsData[targetRoom].doorX; currentY = roomsData[targetRoom].doorY;
-                    pet.style.left = currentX + 'px'; pet.style.top = currentY + 'px';
-                    await sleep(1500);
-                }
-            }
+    await smartWalk(targetData.left, targetData.top, targetData.room);
 
-            faceTarget(targetX);
-            currentX = targetX; currentY = targetY;
-            pet.style.left = currentX + 'px'; pet.style.top = currentY + 'px';
-            await sleep(1500);
+    if(currentAction !== type) return;
 
-            currentRoom = targetRoom;
-            isMoving = false;
-        }
+    if (type === 'desk') setSprite('work');
+    else if (type === 'tv') setSprite('game');
+    else if (type === 'sofa') setSprite('nap_sofa');
+    else if (type === 'toilet') setSprite('toilet');
+    else if (type === 'sink') setSprite('wash');
+    else if (type === 'shower') setSprite('shower');
+    else if (type === 'bed') { setSprite('sleep'); petSprite.classList.add('sleeping'); }
 
-        function pokePet() {
-            if (currentAction === 'sleeping') { speak("zzZ..."); return; }
-            mood = Math.min(100, mood + 20); updateUI();
-            if (currentAction === 'sad' && mood >= 30) {
-                currentAction = 'wandering'; setSprite('stand'); statusDisplay.innerText = '闲逛中';
-                speak("谢谢主人，心情好些了..."); return;
-            } else if (currentAction === 'sad') { speak("别碰我..."); return; }
-            const replies = [`主人好！`, `我是${petName}~`, "贴贴！", "好痒呀~"];
-            speak(replies[Math.floor(Math.random() * replies.length)]);
-        }
+    if (type === 'desk') { speak("搬砖赚钱..."); mood = Math.max(0, mood - 10); energy = Math.max(0, energy - 10); setTimeout(() => { if (currentAction === 'desk') { coins += 20; speak("赚了20金币！"); updateUI(); } }, 4000); }
+    if (type === 'tv') { speak("还是游戏好玩！"); mood = Math.min(100, mood + 15); }
+    if (type === 'sofa') { speak("眯一会儿..."); energy = Math.min(100, energy + 10); }
+    if (type === 'toilet') { speak("解决人生大事"); mood = Math.min(100, mood + 5); }
+    if (type === 'sink') { speak("洗脸刷牙~"); mood = Math.min(100, mood + 5); }
+    if (type === 'shower') { speak("洗刷刷洗刷刷"); energy = Math.min(100, energy + 5); mood = Math.min(100, mood + 10); }
+    updateUI();
 
-        async function movePet() {
-            if (currentAction !== 'wandering' || isMoving) return;
+    if(type !== 'bed') {
+        setTimeout(() => {
+            if (currentAction === type) { currentAction = 'wandering'; statusDisplay.innerText = '闲逛中'; setSprite('stand'); }
+        }, 5000);
+    }
+}
 
-            if (mood < 20) {
-                currentAction = 'sad'; setSprite('sad'); statusDisplay.innerText = '极度烦躁';
-                speak("我什么都不想干！！"); return;
-            }
+function feedPet() {
+    if (coins < 5) { speak("没钱买饭了！"); return; }
+    coins -= 5; hunger = Math.min(100, hunger + 20); mood = Math.min(100, mood + 5);
+    speak("好吃！"); updateUI();
+    if (currentAction === 'sad' && mood >= 30) {
+        currentAction = 'wandering'; setSprite('stand'); statusDisplay.innerText = '闲逛中';
+        speak("吃到好吃的，心情好多了！");
+    }
+}
 
-            const rand = Math.random();
-            if (rand < 0.2) { setSprite('stand'); statusDisplay.innerText = '发呆中'; speak("阿巴阿巴..."); return; }
-            else if (rand < 0.4) { setSprite('nap_stand'); statusDisplay.innerText = '打盹中'; speak("站着睡着了..."); return; }
-
-            statusDisplay.innerText = '闲逛中';
-
-            const roomNames = Object.keys(roomsData);
-            const targetRoom = Math.random() < 0.3 ? roomNames[Math.floor(Math.random() * roomNames.length)] : currentRoom;
-            const zone = roomsData[targetRoom];
-
-            const targetX = Math.floor(Math.random() * (zone.maxX - zone.minX) + zone.minX);
-            const targetY = Math.floor(Math.random() * (zone.maxY - zone.minY) + zone.minY);
-
-            await smartWalk(targetX, targetY, targetRoom);
-
-            if (currentAction === 'wandering') setSprite('stand');
-            if (Math.random() < 0.2) { if (hunger < 40) speak("肚子饿了..."); else if (mood < 50) speak("好无聊..."); }
-        }
-
-        function timePasses() {
-            if (currentAction === 'wandering' || currentAction === 'sad') {
-                hunger = Math.max(0, hunger - 1); energy = Math.max(0, energy - 5);
-                if (Math.random() < 0.5) coins += 1;
-                if (energy < 30 && !isMoving) { interactWith('bed'); speak("扛不住了，去睡觉..."); }
-            } else if (currentAction === 'bed') {
-                energy = Math.min(100, energy + 15);
-                if (energy === 100) { currentAction = 'wandering'; statusDisplay.innerText = '闲逛中'; petSprite.classList.remove('sleeping'); setSprite('stand'); speak("睡饱啦！"); }
-            }
-            if (hunger < 50) mood = Math.max(0, mood - 2);
-            updateUI();
-        }
-
-        async function interactWith(type) {
-            if (currentAction === 'bed' && type !== 'bed') { speak("呼噜噜..."); return; }
-            if (currentAction === 'sad') { speak("别管我，烦着呢！"); return; }
-            if (isMoving) { speak("正走着呢，别催！"); return; }
-
-            currentAction = type;
-            const statusMap = { desk: '工作中', tv: '打游戏中', sofa: '沙发打盹', toilet: '上厕所', sink: '洗漱', shower: '洗澡', bed: '睡觉中' };
-            statusDisplay.innerText = statusMap[type];
-
-            const targetData = furnitureCoords[type];
-
-            await smartWalk(targetData.left, targetData.top, targetData.room);
-
-            if(currentAction !== type) return;
-
-            if (type === 'desk') setSprite('work');
-            else if (type === 'tv') setSprite('game');
-            else if (type === 'sofa') setSprite('nap_sofa');
-            else if (type === 'toilet') setSprite('toilet');
-            else if (type === 'sink') setSprite('wash');
-            else if (type === 'shower') setSprite('shower');
-            else if (type === 'bed') { setSprite('sleep'); petSprite.classList.add('sleeping'); }
-
-            if (type === 'desk') { speak("搬砖赚钱..."); mood = Math.max(0, mood - 10); energy = Math.max(0, energy - 10); setTimeout(() => { if (currentAction === 'desk') { coins += 20; speak("赚了20金币！"); updateUI(); } }, 4000); }
-            if (type === 'tv') { speak("还是游戏好玩！"); mood = Math.min(100, mood + 15); }
-            if (type === 'sofa') { speak("眯一会儿..."); energy = Math.min(100, energy + 10); }
-            if (type === 'toilet') { speak("解决人生大事"); mood = Math.min(100, mood + 5); }
-            if (type === 'sink') { speak("洗脸刷牙~"); mood = Math.min(100, mood + 5); }
-            if (type === 'shower') { speak("洗刷刷洗刷刷"); energy = Math.min(100, energy + 5); mood = Math.min(100, mood + 10); }
-            updateUI();
-
-            if(type !== 'bed') {
-                setTimeout(() => {
-                    if (currentAction === type) { currentAction = 'wandering'; statusDisplay.innerText = '闲逛中'; setSprite('stand'); }
-                }, 5000);
-            }
-        }
-
-        function feedPet() {
-            if (coins < 5) { speak("没钱买饭了！"); return; }
-            coins -= 5; hunger = Math.min(100, hunger + 20); mood = Math.min(100, mood + 5);
-            speak("好吃！"); updateUI();
-            if (currentAction === 'sad' && mood >= 30) {
-                currentAction = 'wandering'; setSprite('stand'); statusDisplay.innerText = '闲逛中';
-                speak("吃到好吃的，心情好多了！");
-            }
-        }
-
-        window.onload = initGame;
+window.onload = initGame;
     </script>
 </body>
 </html>
